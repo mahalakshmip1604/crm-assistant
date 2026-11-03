@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+jinja2
+python-multipart
+faker
+pandas
+openai
+python-dotenv
+pydantic

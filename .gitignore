@@ -1,0 +1,4 @@
+.venv/
+.env
+crm.db
+__pycache__/
