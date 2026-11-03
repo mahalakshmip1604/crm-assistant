@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CRM Assistant</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
+    table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+    th, td { border: 1px solid #ccc; padding: .4rem .6rem; text-align: left; }
+    th { background: #f3f3f3; }
+    input[type=text] { width: 75%; padding: .5rem; }
+    .error { color: #b00020; }
+    code { background: #f3f3f3; padding: 2px 4px; word-break: break-word; }
+    .note { color: #666; font-size: .9rem; }
+  </style>
+</head>
+<body>
+  <h1>CRM Assistant</h1>
+
+  <form method="post" action="/ask">
+    <input type="text" name="question" value="{{ question }}"
+           placeholder="e.g. Which industry has the most active contracts?" required>
+    <button type="submit">Ask</button>
+  </form>
+
+  {% if error %}<p class="error">{{ error }}</p>{% endif %}
+
+  {% if result %}
+    <h2>Answer</h2>
+    <p>{{ result.summary }}</p>
+    <p class="note">AI-written summary. Check the SQL and the table below before relying on it.</p>
+    <p><strong>SQL used:</strong> <code>{{ result.sql }}</code></p>
+    {% if result.explanation %}<p><strong>Assumptions:</strong> {{ result.explanation }}</p>{% endif %}
+    <table>
+      <tr>{% for c in result.cols %}<th>{{ c }}</th>{% endfor %}</tr>
+      {% for r in result.rows %}<tr>{% for v in r %}<td>{{ v }}</td>{% endfor %}</tr>{% endfor %}
+    </table>
+  {% endif %}
+
+  <h2>Top 10 accounts by active monthly value</h2>
+  <table>
+    <tr>{% for c in cols %}<th>{{ c }}</th>{% endfor %}</tr>
+    {% for r in rows %}<tr>{% for v in r %}<td>{{ v }}</td>{% endfor %}</tr>{% endfor %}
+  </table>
+</body>
+</html>
