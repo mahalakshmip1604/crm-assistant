@@ -9,7 +9,7 @@ templates = Jinja2Templates(directory="templates")
 
 def page(request: Request, result=None, error=None, question=""):
     cols, rows = run_sql("""
-        SELECT a.name, a.industry, ROUND(SUM(c.monthly_value),0) AS monthly_value
+        SELECT a.name, a.industry, CAST(ROUND(SUM(c.monthly_value),0) AS INTEGER) AS monthly_value
         FROM accounts a JOIN contracts c ON c.account_id = a.id
         WHERE c.status = 'active' GROUP BY a.id ORDER BY monthly_value DESC LIMIT 10""")
     return templates.TemplateResponse(

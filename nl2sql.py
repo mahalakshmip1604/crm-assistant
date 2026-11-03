@@ -76,6 +76,7 @@ Rules:
 - Always include the columns needed to verify the answer (for rankings, include the aggregated value).
 - Only return an empty string for "sql" if the question truly cannot be answered from this schema.
 - State any assumption you make in "explanation".
+- For "most", "highest" or "top" questions, return all groups ordered descending, and use LIMIT only when the question asks for a specific number (for example "top 5").
 Reply ONLY with JSON: {{"sql": "...", "explanation": "..."}}"""
 
 
