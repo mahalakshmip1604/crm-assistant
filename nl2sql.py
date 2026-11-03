@@ -48,13 +48,34 @@ def question_to_sql(question: str) -> SQLAnswer:
         raise ValueError(f"Unsafe SQL blocked: {ans.sql}")
     return ans
 
+HINT_COLUMNS = [("accounts", "industry"), ("accounts", "country"),
+                ("contracts", "product"), ("contracts", "status"),
+                ("interactions", "type"), ("contacts", "role")]
+
+
+def get_value_hints() -> str:
+    """List the distinct values of low-cardinality columns so the model uses them correctly."""
+    con = connect()
+    lines = []
+    for table, col in HINT_COLUMNS:
+        vals = [r[0] for r in con.execute(f"SELECT DISTINCT {col} FROM {table} ORDER BY 1")]
+        lines.append(f"{table}.{col}: {vals}")
+    con.close()
+    return "\n".join(lines)
+
 def build_system() -> str:
     return f"""You translate questions into a single SQLite SELECT query.
 Schema:
 {get_schema()}
-Rules: use only these tables and columns. Contract status values are 'active' or 'expired'.
-If the question cannot be answered from this schema, return an empty string for "sql".
-State any assumption you make in "explanation".
+
+Allowed values of categorical columns:
+{get_value_hints()}
+
+Rules:
+- Use only these tables and columns.
+- Always include the columns needed to verify the answer (for rankings, include the aggregated value).
+- Only return an empty string for "sql" if the question truly cannot be answered from this schema.
+- State any assumption you make in "explanation".
 Reply ONLY with JSON: {{"sql": "...", "explanation": "..."}}"""
 
 
